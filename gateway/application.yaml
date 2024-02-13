@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user
+          predicates:
+            - Path=/user/**
+          filters:
+            - TokenPreFilter
+            - RewritePath=/user/?(?<segment>.*), /$\{segment}
+        - id: chat-service
+          uri: lb://chat
+          predicates:
+            - Path=/chat/**
+          filters:
+            - TokenPreFilter
+            - RewritePath=/chat/?(?<segment>.*), /$\{segment}
+        - id: message-service
+          uri: lb://message
+          predicates:
+            - Path=/message/**
+          filters:
+            - TokenPreFilter
+            - RewritePath=/message/?(?<segment>.*), /$\{segment}
+
+  application:
+    name: gateway
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
+    reactor.netty: DEBUG
+
